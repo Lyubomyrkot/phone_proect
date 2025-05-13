@@ -8,6 +8,7 @@ from kivy.core.window import Window
 from kivy.uix.scrollview import ScrollView
 from kivy.animation import Animation
 from kivy.uix.popup import Popup
+from kivy.clock import Clock
 
 from instructions import *
 from ruffier import *
@@ -92,6 +93,11 @@ class InsructionScreen(Screen):
 class PulseScreen(Screen):
    def __init__(self, **kwargs):
       super().__init__(**kwargs)
+      self.time = 0
+      self.timer_event = None
+      self.timer_label = Label(text="Час: 0",
+                                size_hint=(1, 0.1),
+                                font_size=24)
       lbl1 = Label(text = txt_test1,
                      size_hint=(1, 0.2))
       lbl2 = Label(text = "Введіть [b] результат: [/b]",
@@ -106,12 +112,27 @@ class PulseScreen(Screen):
                         pos_hint={"center_x": 0.5},
                         spacing=10,
                         padding=10)
+      
       v_line.add_widget(lbl1)
       v_line.add_widget(lbl2)
+      v_line.add_widget(self.timer_label)
       v_line.add_widget(self.result_input)
       v_line.add_widget(self.btn)
       self.btn.on_press = self.next
       self.add_widget(v_line)
+
+   def on_enter(self):
+      self.time = 0
+      self.timer_label.text = "Час: 0"
+      self.timer_event = Clock.schedule_interval(self.update_timer, 1)
+
+   def on_leave(self):
+      if self.timer_event:
+         self.timer_event.cancel()
+
+   def update_timer(self, dt):
+      self.time += 1
+      self.timer_label.text = f"Час: {self.time}"
 
    def next(self):
       anim = Animation(background_color = (2, 8, 2, 1), duration = 1)
