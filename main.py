@@ -7,6 +7,7 @@ from kivy.uix.textinput import TextInput
 from kivy.core.window import Window
 from kivy.uix.scrollview import ScrollView
 from kivy.animation import Animation
+from kivy.uix.popup import Popup
 
 from instructions import *
 from ruffier import *
@@ -15,6 +16,8 @@ BG_COLOR = "#392e8f"
 BTN_COLOR= "#f2f2f2"
 Window.clearcolor = BG_COLOR
 
+p1, p2, p3 = 0, 0, 0
+age = 7
 class MyButton(Button):
    def __init__(self, **kwargs):
       super().__init__(**kwargs)
@@ -39,16 +42,16 @@ class InsructionScreen(Screen):
 
       instr = Label(text = txt_instruction)
 
-      lbl1 = Label(text = "Ввеліть [b] iм'я: [/b]", 
+      lbl1 = Label(text = "Введіть [b] iм'я: [/b]", 
                   size_hint=(1, None),
                   height="30sp",
                   markup=True)
-      lbl2 = Label(text = "Ввеліть [b] вiк: [/b]",
+      lbl2 = Label(text = "Введіть [b] вiк: [/b]",
                   size_hint=(1, None),
                   height="30sp",
                   markup=True)
-      name_input = MyTextInput()
-      age_input = MyTextInput()
+      self.name_input = MyTextInput()
+      self.age_input = MyTextInput()
       start_button = MyButton(text="[b] Почати [/b]")
       start_button.on_press = self.next
 
@@ -59,27 +62,43 @@ class InsructionScreen(Screen):
                         padding=10)
       v_line.add_widget(instr)
       v_line.add_widget(lbl1)
-      v_line.add_widget(name_input)
+      v_line.add_widget(self.name_input)
       v_line.add_widget(lbl2)
-      v_line.add_widget(age_input)
+      v_line.add_widget(self.age_input)
       v_line.add_widget(start_button)
 
       self.add_widget(v_line)
 
    def next(self):
-        self.manager.transition.direction = 'left'
-        self.manager.current = 'pulse'
+      global age
+      if self.name_input.text != "" and self.age_input.text.strip() != "":
+         try:
+            age = int(self.age_input.text.strip())
+            if age >= 7:
+               self.manager.transition.direction = 'left'
+               self.manager.current = 'pulse'
+            else:
+               error = Popup(title="Вік має бути числом більше 7",
+                              size_hint=(0.6, 0.2),
+                              auto_dismiss=True)
+               error.open()
+         except:
+            error = Popup(title="Вік має бути числом",
+                           size_hint=(0.6, 0.2),
+                           auto_dismiss=True)
+            error.open()
+      
 
 class PulseScreen(Screen):
    def __init__(self, **kwargs):
       super().__init__(**kwargs)
       lbl1 = Label(text = txt_test1,
                      size_hint=(1, 0.2))
-      lbl2 = Label(text = "Ввеліть [b] результат: [/b]",
+      lbl2 = Label(text = "Введіть [b] результат: [/b]",
                      size_hint=(1, None),
                      height="30sp",
                      markup=True)
-      result_input = MyTextInput()
+      self.result_input = MyTextInput()
       self.btn = MyButton(text="[b] Почати [/b]")
 
       v_line = BoxLayout(orientation='vertical',
@@ -89,7 +108,7 @@ class PulseScreen(Screen):
                         padding=10)
       v_line.add_widget(lbl1)
       v_line.add_widget(lbl2)
-      v_line.add_widget(result_input)
+      v_line.add_widget(self.result_input)
       v_line.add_widget(self.btn)
       self.btn.on_press = self.next
       self.add_widget(v_line)
@@ -97,17 +116,24 @@ class PulseScreen(Screen):
    def next(self):
       anim = Animation(background_color = (2, 8, 2, 1), duration = 1)
       anim.start(self.btn)
-
-
-      self.manager.transition.direction = 'left'
-      self.manager.current = 'sits'
+      if self.result_input.text != "":
+         try:
+            global p1
+            p1 = int(self.result_input.text.strip())
+            self.manager.transition.direction = 'left'
+            self.manager.current = 'sits'
+         except:
+            error = Popup(title="Результат має бути числом",
+                          size_hint=(0.6, 0.2),
+                          auto_dismiss=True)
+            error.open()
 
 class Sitscreen(Screen):
    def __init__(self, **kwargs):
       super().__init__(**kwargs)
       lbl1 = Label(text = txt_sits,
                      size_hint=(1, 0.2))
-      btn = MyButton(text="[b] Почати [/b]")
+      btn = MyButton(text="[b] Продовжити [/b]")
       btn.on_press = self.next
       v_line = BoxLayout(orientation='vertical',
                         size_hint=(0.9, 1), 
@@ -126,16 +152,16 @@ class TaskScreen(Screen):
       super().__init__(**kwargs)
       lbl1 = Label(text = txt_test3,
                      size_hint=(1, 0.2))
-      lbl2 = Label(text = "Ввеліть [b] результат: [/b]",
+      lbl2 = Label(text = "Введіть [b] результат: [/b]",
                      size_hint=(1, None),
                      height="30sp",
                      markup=True)
-      result_input = MyTextInput()
-      lbl3 = Label(text = "Ввеліть [b] результат після відпочинку:[/b]",
+      self.result_input = MyTextInput()
+      lbl3 = Label(text = "Введіть [b] результат після відпочинку:[/b]",
                      size_hint=(1, None),
                      height="30sp",
                      markup=True)
-      result_input2 = MyTextInput()
+      self.result_input2 = MyTextInput()
       btn = MyButton(text="[b] Почати [/b]")
       btn.on_press = self.next
       v_line = BoxLayout(orientation='vertical',
@@ -145,19 +171,52 @@ class TaskScreen(Screen):
                         padding=10)
       v_line.add_widget(lbl1)
       v_line.add_widget(lbl2)
-      v_line.add_widget(result_input)
+      v_line.add_widget(self.result_input)
       v_line.add_widget(lbl3)
-      v_line.add_widget(result_input2)
+      v_line.add_widget(self.result_input2)
       v_line.add_widget(btn)
       self.add_widget(v_line)
 
    def next(self):
-      self.manager.transition.direction = 'left'
-      self.manager.current = 'result'
+      if self.result_input.text != "":
+         try:
+            global p2
+            p2 = int(self.result_input.text.strip())
+            self.manager.transition.direction = 'left'
+            self.manager.current = 'result'
+         except:
+            error = Popup(title="Результат має бути числом",
+                          size_hint=(0.6, 0.2),
+                          auto_dismiss=True)
+            error.open()
+      if self.result_input2.text != "":
+         try:
+            global p3
+            p3 = int(self.result_input2.text.strip())
+            self.manager.transition.direction = 'left'
+            self.manager.current = 'result'
+         except:
+            error = Popup(title="Результат має бути числом",
+                          size_hint=(0.6, 0.2),
+                          auto_dismiss=True)
+            error.open()
 
 class ResultScreen(Screen):
    def __init__(self, **kwargs):
       super().__init__(**kwargs)
+      self.result_label = Label(text = "")
+      v_line = BoxLayout(orientation='vertical',
+                        size_hint=(0.9, 1), 
+                        pos_hint={"center_x": 0.5},
+                        spacing=10,
+                        padding=10)
+      v_line.add_widget(self.result_label)
+      self.on_press = self.before()
+      self.add_widget(v_line)
+
+   def before(self):
+      result = test(p1, p2, p3, age)
+      self.result_label.text = result
 
 class HeartChech(App):
    def build(self):
