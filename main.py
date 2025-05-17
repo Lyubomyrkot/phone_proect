@@ -1,11 +1,13 @@
-from kivy.app import App
-from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.label import Label
-from kivy.uix.button import Button
-from kivy.uix.textinput import TextInput
+from kivymd.app import MDApp as App
+from kivymd.uix.screenmanager import MDScreenManager as ScreenManager 
+from kivymd.uix.screen import MDScreen as Screen
+
+from kivymd.uix.boxlayout import MDBoxLayout as BoxLayout
+from kivymd.uix.label import MDLabel as Label
+from kivymd.uix.button import MDRaisedButton as Button
+from kivymd.uix.textfield import MDTextField as TextInput
 from kivy.core.window import Window
-from kivy.uix.scrollview import ScrollView
+from kivymd.uix.scrollview import MDScrollView as ScrollView
 from kivy.animation import Animation
 from kivy.uix.popup import Popup
 from kivy.clock import Clock
@@ -13,7 +15,7 @@ from kivy.clock import Clock
 from instructions import *
 from ruffier import *
 
-BG_COLOR = "#392e8f"
+BG_COLOR = "#4e4a6a"
 BTN_COLOR= "#f2f2f2"
 Window.clearcolor = BG_COLOR
 
@@ -41,7 +43,10 @@ class InsructionScreen(Screen):
    def __init__(self, **kwargs):
       super().__init__(**kwargs)
 
-      instr = Label(text = txt_instruction)
+      instr = Label(text = txt_instruction,
+                     halign="left",
+                     valign="top",
+                     text_size=(Window.width*0.9, None))
 
       lbl1 = Label(text = "Введіть [b] iм'я: [/b]", 
                   size_hint=(1, None),
@@ -135,8 +140,6 @@ class PulseScreen(Screen):
       self.timer_label.text = f"Час: {self.time}"
 
    def next(self):
-      anim = Animation(background_color = (2, 8, 2, 1), duration = 1)
-      anim.start(self.btn)
       if self.result_input.text != "":
          try:
             global p1
@@ -241,6 +244,8 @@ class ResultScreen(Screen):
 
 class HeartChech(App):
    def build(self):
+      self.theme_cls.primary_palette = "Orange"
+      self.theme_cls.theme_style = "Dark"  # "Light"
       sm = ScreenManager()
       sm.add_widget(InsructionScreen(name='instruction'))
       sm.add_widget(PulseScreen(name='pulse'))
